@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/api-main/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/api-main/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/api-main",
+  "projects": {
+    "answer": {
+      "type": "application",
+      "root": "apps/answer",
+      "entryFile": "main",
+      "sourceRoot": "apps/answer/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/answer/tsconfig.app.json"
+      }
+    },
+    "admin": {
+      "type": "application",
+      "root": "apps/admin",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin/tsconfig.app.json"
+      }
+    },
+    "boss": {
+      "type": "application",
+      "root": "apps/boss",
+      "entryFile": "main",
+      "sourceRoot": "apps/boss/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/boss/tsconfig.app.json"
+      }
+    },
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "api-main": {
+      "type": "application",
+      "root": "apps/api-main",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-main/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-main/tsconfig.app.json"
+      }
+    },
+    "api-stock": {
+      "type": "application",
+      "root": "apps/api-stock",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-stock/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-stock/tsconfig.app.json"
+      }
+    },
+    "api-user": {
+      "type": "application",
+      "root": "apps/api-user",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-user/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-user/tsconfig.app.json"
+      }
+    },
+    "auth-service": {
+      "type": "application",
+      "root": "apps/auth-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth-service/tsconfig.app.json"
+      }
+    },
+    "media-service": {
+      "type": "application",
+      "root": "apps/media-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/media-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/media-service/tsconfig.app.json"
+      }
+    },
+    "notification-service": {
+      "type": "application",
+      "root": "apps/notification-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification-service/tsconfig.app.json"
+      }
+    },
+    "order-service": {
+      "type": "application",
+      "root": "apps/order-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/order-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/order-service/tsconfig.app.json"
+      }
+    },
+    "payment-service": {
+      "type": "application",
+      "root": "apps/payment-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/payment-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/payment-service/tsconfig.app.json"
+      }
+    },
+    "product-service": {
+      "type": "application",
+      "root": "apps/product-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/product-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/product-service/tsconfig.app.json"
+      }
+    },
+    "quiz": {
+      "type": "application",
+      "root": "apps/quiz",
+      "entryFile": "main",
+      "sourceRoot": "apps/quiz/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/quiz/tsconfig.app.json"
+      }
+    },
+    "quiz-gateway": {
+      "type": "application",
+      "root": "apps/quiz-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/quiz-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/quiz-gateway/tsconfig.app.json"
+      }
+    },
+    "statistic": {
+      "type": "application",
+      "root": "apps/statistic",
+      "entryFile": "main",
+      "sourceRoot": "apps/statistic/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/statistic/tsconfig.app.json"
+      }
+    },
+    "student": {
+      "type": "application",
+      "root": "apps/student",
+      "entryFile": "main",
+      "sourceRoot": "apps/student/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/student/tsconfig.app.json"
+      }
+    },
+    "user-service": {
+      "type": "application",
+      "root": "apps/user-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/user-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/user-service/tsconfig.app.json"
+      }
+    },
+    "util": {
+      "type": "library",
+      "root": "libs/util",
+      "entryFile": "index",
+      "sourceRoot": "libs/util/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/util/tsconfig.lib.json"
+      }
+    },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
+    },
+    "cloudinary": {
+      "type": "library",
+      "root": "libs/cloudinary",
+      "entryFile": "index",
+      "sourceRoot": "libs/cloudinary/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cloudinary/tsconfig.lib.json"
+      }
+    }
+  }
+}

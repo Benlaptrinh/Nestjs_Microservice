@@ -1,0 +1,170 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: quiz-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: quiz_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - quiz-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: auth-service
+    container_name: auth-service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=quiz_db
+      - JWT_SECRET=your-super-secret-jwt-key
+      - PORT=3001
+    ports:
+      - '3001:3001'
+    depends_on:
+      - postgres
+    networks:
+      - quiz-network
+    restart: unless-stopped
+
+  student-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: student
+    container_name: student-service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=quiz_db
+      - JWT_SECRET=your-super-secret-jwt-key
+      - PORT=3002
+    ports:
+      - '3002:3002'
+    depends_on:
+      - postgres
+    networks:
+      - quiz-network
+    restart: unless-stopped
+
+  quiz-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: quiz
+    container_name: quiz-service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=quiz_db
+      - JWT_SECRET=your-super-secret-jwt-key
+      - PORT=3003
+    ports:
+      - '3003:3003'
+    depends_on:
+      - postgres
+    networks:
+      - quiz-network
+    restart: unless-stopped
+
+  answer-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: answer
+    container_name: answer-service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=quiz_db
+      - JWT_SECRET=your-super-secret-jwt-key
+      - PORT=3004
+    ports:
+      - '3004:3004'
+    depends_on:
+      - postgres
+    networks:
+      - quiz-network
+    restart: unless-stopped
+
+  statistic-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: statistic
+    container_name: statistic-service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=quiz_db
+      - JWT_SECRET=your-super-secret-jwt-key
+      - PORT=3005
+    ports:
+      - '3005:3005'
+    depends_on:
+      - postgres
+    networks:
+      - quiz-network
+    restart: unless-stopped
+
+  quiz-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: quiz-gateway
+    container_name: quiz-gateway
+    environment:
+      - AUTH_SERVICE_HOST=auth-service
+      - AUTH_SERVICE_PORT=3001
+      - STUDENT_SERVICE_HOST=student-service
+      - STUDENT_SERVICE_PORT=3002
+      - QUIZ_SERVICE_HOST=quiz-service
+      - QUIZ_SERVICE_PORT=3003
+      - ANSWER_SERVICE_HOST=answer-service
+      - ANSWER_SERVICE_PORT=3004
+      - STATISTIC_SERVICE_HOST=statistic-service
+      - STATISTIC_SERVICE_PORT=3005
+      - JWT_SECRET=your-super-secret-jwt-key
+      - PORT=3000
+    ports:
+      - '3000:3000'
+    depends_on:
+      - auth-service
+      - student-service
+      - quiz-service
+      - answer-service
+      - statistic-service
+    networks:
+      - quiz-network
+    restart: unless-stopped
+
+networks:
+  quiz-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
