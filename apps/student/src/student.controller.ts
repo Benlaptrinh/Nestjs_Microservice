@@ -29,8 +29,18 @@ export class StudentController {
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
-  async updateProfile(@CurrentUser() user: any, @Body() updateData: any) {
-    return this.studentService.updateProfile(user.userId, updateData);
+  @UseInterceptors(FileInterceptor('avatar')) // Accept optional avatar file
+  async updateProfile(
+    @CurrentUser() user: any,
+    @Body() updateData: any,
+    @UploadedFile() avatar?: Express.Multer.File,
+  ) {
+    // Validate avatar if provided
+    if (avatar) {
+      this.validateImageFile(avatar);
+    }
+
+    return this.studentService.updateProfile(user.userId, updateData, avatar);
   }
 
   @Get('quiz-history')

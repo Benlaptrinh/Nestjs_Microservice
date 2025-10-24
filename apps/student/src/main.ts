@@ -15,7 +15,12 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  app.enableCors();
+  
+  // Enable CORS for React frontend
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://localhost:5173'], // React default ports
+    credentials: true,
+  });
 
   await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3002);

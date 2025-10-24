@@ -33,13 +33,34 @@ export class StudentService {
     };
   }
 
-  async updateProfile(userId: string, updateData: Partial<User>) {
+  async updateProfile(
+    userId: string,
+    updateData: Partial<User>,
+    avatarFile?: Express.Multer.File,
+  ) {
     const user = await this.userRepository.findOne({
       where: { id: userId, role: UserRole.USER },
     });
 
     if (!user) {
       throw new NotFoundException('Student not found');
+    }
+
+    // Upload avatar to Cloudinary if provided
+    if (avatarFile) {
+      // Delete old avatar from Cloudinary if exists
+      if (user.avatar) {
+        try {
+          const publicId = this.extractPublicId(user.avatar);
+          await this.cloudinaryService.deleteImage(publicId);
+        } catch (error) {
+          console.warn('Failed to delete old avatar:', error);
+        }
+      }
+
+      // Upload new avatar
+      const uploadResult = await this.cloudinaryService.uploadImage(avatarFile);
+      updateData.avatar = uploadResult.url;
     }
 
     // Không cho phép thay đổi role qua API này
@@ -234,5 +255,24 @@ export class StudentService {
       deletedCount: images.length,
       remainingImages: remainingCount,
     };
+  }
+
+  /**
+   * Extract Cloudinary publicId from URL
+   * URL format: https://res.cloudinary.com/{cloud_name}/image/upload/{folder}/{publicId}.jpg
+   */
+  private extractPublicId(url: string): string {
+    try {
+      const parts = url.split('/');
+      const uploadIndex = parts.findIndex((part) => part === 'upload');
+      if (uploadIndex === -1) return '';
+
+      // Get everything after 'upload/', remove extension
+      const pathAfterUpload = parts.slice(uploadIndex + 1).join('/');
+      return pathAfterUpload.replace(/\.[^/.]+$/, ''); // Remove extension
+    } catch (error) {
+      console.error('Failed to extract publicId from URL:', url);
+      return '';
+    }
   }
 }
