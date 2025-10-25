@@ -10,15 +10,6 @@
   "monorepo": true,
   "root": "apps/api-main",
   "projects": {
-    "answer": {
-      "type": "application",
-      "root": "apps/answer",
-      "entryFile": "main",
-      "sourceRoot": "apps/answer/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/answer/tsconfig.app.json"
-      }
-    },
     "admin": {
       "type": "application",
       "root": "apps/admin",
@@ -28,13 +19,13 @@
         "tsConfigPath": "apps/admin/tsconfig.app.json"
       }
     },
-    "boss": {
+    "answer": {
       "type": "application",
-      "root": "apps/boss",
+      "root": "apps/answer",
       "entryFile": "main",
-      "sourceRoot": "apps/boss/src",
+      "sourceRoot": "apps/answer/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/boss/tsconfig.app.json"
+        "tsConfigPath": "apps/answer/tsconfig.app.json"
       }
     },
     "api-gateway": {
@@ -73,6 +64,15 @@
         "tsConfigPath": "apps/api-user/tsconfig.app.json"
       }
     },
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
+    },
     "auth-service": {
       "type": "application",
       "root": "apps/auth-service",
@@ -80,6 +80,33 @@
       "sourceRoot": "apps/auth-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/auth-service/tsconfig.app.json"
+      }
+    },
+    "boss": {
+      "type": "application",
+      "root": "apps/boss",
+      "entryFile": "main",
+      "sourceRoot": "apps/boss/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/boss/tsconfig.app.json"
+      }
+    },
+    "cloudinary": {
+      "type": "library",
+      "root": "libs/cloudinary",
+      "entryFile": "index",
+      "sourceRoot": "libs/cloudinary/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cloudinary/tsconfig.lib.json"
+      }
+    },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
       }
     },
     "media-service": {
@@ -107,6 +134,15 @@
       "sourceRoot": "apps/order-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/order-service/tsconfig.app.json"
+      }
+    },
+    "payment": {
+      "type": "application",
+      "root": "apps/payment",
+      "entryFile": "main",
+      "sourceRoot": "apps/payment/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/payment/tsconfig.app.json"
       }
     },
     "payment-service": {
@@ -179,33 +215,6 @@
       "sourceRoot": "libs/util/src",
       "compilerOptions": {
         "tsConfigPath": "libs/util/tsconfig.lib.json"
-      }
-    },
-    "database": {
-      "type": "library",
-      "root": "libs/database",
-      "entryFile": "index",
-      "sourceRoot": "libs/database/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/database/tsconfig.lib.json"
-      }
-    },
-    "auth": {
-      "type": "library",
-      "root": "libs/auth",
-      "entryFile": "index",
-      "sourceRoot": "libs/auth/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/auth/tsconfig.lib.json"
-      }
-    },
-    "cloudinary": {
-      "type": "library",
-      "root": "libs/cloudinary",
-      "entryFile": "index",
-      "sourceRoot": "libs/cloudinary/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/cloudinary/tsconfig.lib.json"
       }
     }
   }

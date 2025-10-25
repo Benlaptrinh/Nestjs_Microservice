@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User, Quiz, Question, QuizAttempt, Answer, UserImage } from './entities';
+import { User, Quiz, Question, QuizAttempt, Answer, UserImage, Subscription, Transaction } from './entities';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { User, Quiz, Question, QuizAttempt, Answer, UserImage } from './entities
         username: configService.get('DB_USERNAME', 'postgres'),
         password: configService.get('DB_PASSWORD', 'postgres'),
         database: configService.get('DB_DATABASE', 'quiz_db'),
-        entities: [User, Quiz, Question, QuizAttempt, Answer, UserImage],
+        entities: [User, Quiz, Question, QuizAttempt, Answer, UserImage, Subscription, Transaction],
         synchronize: configService.get('DB_SYNC', true),
         logging: configService.get('DB_LOGGING', true),
       }),

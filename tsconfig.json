@@ -22,18 +22,6 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/util": [
-        "libs/util/src"
-      ],
-      "@app/util/*": [
-        "libs/util/src/*"
-      ],
-      "@app/database": [
-        "libs/database/src"
-      ],
-      "@app/database/*": [
-        "libs/database/src/*"
-      ],
       "@app/auth": [
         "libs/auth/src"
       ],
@@ -45,6 +33,18 @@
       ],
       "@app/cloudinary/*": [
         "libs/cloudinary/src/*"
+      ],
+      "@app/database": [
+        "libs/database/src"
+      ],
+      "@app/database/*": [
+        "libs/database/src/*"
+      ],
+      "@app/util": [
+        "libs/util/src"
+      ],
+      "@app/util/*": [
+        "libs/util/src/*"
       ]
     }
   }

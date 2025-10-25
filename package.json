@@ -37,6 +37,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.7",
     "@nestjs/typeorm": "^11.0.0",
+    "@paypal/paypal-server-sdk": "^1.1.0",
     "@types/bcrypt": "^6.0.0",
     "@types/multer": "^2.0.0",
     "@types/passport-github2": "^1.2.9",
