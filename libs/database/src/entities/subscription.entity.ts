@@ -21,7 +21,7 @@ export class Subscription {
   id: number;
 
   @Column()
-  userId: number;
+  userId: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })

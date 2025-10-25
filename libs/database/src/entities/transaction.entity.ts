@@ -21,7 +21,7 @@ export class Transaction {
   id: number;
 
   @Column()
-  userId: number;
+  userId: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
@@ -39,6 +39,15 @@ export class Transaction {
 
   @Column({ nullable: true })
   paypalCaptureId: string;
+
+  @Column({ nullable: true })
+  payerId: string; // PayPal Payer ID
+
+  @Column({ nullable: true })
+  payerEmail: string; // Email người thanh toán
+
+  @Column({ nullable: true })
+  payerName: string; // Tên người thanh toán
 
   @Column({
     type: 'enum',
@@ -63,12 +72,21 @@ export class Transaction {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ type: 'text', nullable: true })
+  errorMessage: string; // Lưu lỗi nếu thanh toán thất bại
+
   @Column({ type: 'json', nullable: true })
-  metadata: any;
+  metadata: any; // Lưu plan info, response từ PayPal, etc.
+
+  @Column({ type: 'json', nullable: true })
+  paypalResponse: any; // Full response từ PayPal khi capture
 
   @CreateDateColumn()
   createdAt: Date;
 
   @Column({ type: 'timestamp', nullable: true })
   completedAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  refundedAt: Date; // Ngày hoàn tiền nếu có
 }

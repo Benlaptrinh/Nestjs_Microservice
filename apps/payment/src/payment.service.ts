@@ -52,7 +52,7 @@ export class PaymentService {
     this.logger.log(`PayPal client initialized in ${environment} mode`);
   }
 
-  async createOrder(userId: number, createOrderDto: CreateOrderDto) {
+  async createOrder(userId: string, createOrderDto: CreateOrderDto) {
     const { plan, amount, description } = createOrderDto;
 
     // Get plan pricing
@@ -69,6 +69,8 @@ export class PaymentService {
 
     try {
       // Create PayPal order
+      this.logger.log(`Creating PayPal order for user ${userId}, plan ${plan}, amount ${orderAmount}`);
+      
       const collect = {
         body: {
           intent: CheckoutPaymentIntent.Capture,
@@ -88,7 +90,9 @@ export class PaymentService {
         },
       };
 
+      this.logger.log(`Calling PayPal API...`);
       const { result: order } = await this.ordersController.createOrder(collect);
+      this.logger.log(`PayPal API response received: ${order.id}`);
 
       // Save transaction to database
       const transaction = this.transactionRepository.create({
@@ -118,7 +122,7 @@ export class PaymentService {
     }
   }
 
-  async captureOrder(userId: number, captureOrderDto: CaptureOrderDto) {
+  async captureOrder(userId: string, captureOrderDto: CaptureOrderDto) {
     const { orderId } = captureOrderDto;
 
     // Find transaction
@@ -141,11 +145,32 @@ export class PaymentService {
         prefer: 'return=representation',
       });
 
-      // Update transaction
+      this.logger.log(`PayPal capture successful: ${captureData.id}`);
+
+      // Extract payer information from PayPal response
+      const payer = captureData.payer;
+      const purchaseUnit = captureData.purchaseUnits?.[0];
+      const capture = purchaseUnit?.payments?.captures?.[0];
+
+      // Update transaction with full details
       transaction.status = TransactionStatus.COMPLETED;
       transaction.paypalCaptureId = captureData.id!;
+      if (payer?.payerId) transaction.payerId = payer.payerId;
+      if (payer?.emailAddress) transaction.payerEmail = payer.emailAddress;
+      if (payer?.name) {
+        transaction.payerName = `${payer.name.givenName || ''} ${payer.name.surname || ''}`.trim();
+      }
       transaction.completedAt = new Date();
+      transaction.paypalResponse = captureData; // Lưu full response để trace lại
+
+      // Update amount nếu có từ capture response
+      if (capture?.amount?.value) {
+        transaction.amount = parseFloat(capture.amount.value);
+      }
+
       await this.transactionRepository.save(transaction);
+
+      this.logger.log(`Transaction updated with payer info: ${transaction.payerEmail}`);
 
       // Create or update subscription
       const plan = transaction.metadata.plan as SubscriptionPlan;
@@ -182,17 +207,31 @@ export class PaymentService {
       this.logger.log(`Order captured: ${orderId} for user ${userId}`);
 
       return {
-        transactionId: transaction.id,
-        status: 'COMPLETED',
+        success: true,
+        message: 'Payment captured successfully',
+        transaction: {
+          id: transaction.id,
+          orderId: transaction.paypalOrderId,
+          captureId: transaction.paypalCaptureId,
+          amount: transaction.amount,
+          currency: transaction.currency,
+          status: transaction.status,
+          payerEmail: transaction.payerEmail,
+          payerName: transaction.payerName,
+          completedAt: transaction.completedAt,
+        },
         subscription: {
           plan: subscription.plan,
+          status: subscription.status,
           startDate: subscription.startDate,
           endDate: subscription.endDate,
+          price: subscription.price,
         },
       };
     } catch (error) {
       // Update transaction as failed
       transaction.status = TransactionStatus.FAILED;
+      transaction.errorMessage = error.message;
       await this.transactionRepository.save(transaction);
 
       this.logger.error(`Failed to capture order: ${error.message}`, error.stack);
@@ -200,7 +239,7 @@ export class PaymentService {
     }
   }
 
-  async getUserSubscription(userId: number) {
+  async getUserSubscription(userId: string) {
     const subscription = await this.subscriptionRepository.findOne({
       where: { userId },
       order: { createdAt: 'DESC' },
@@ -231,11 +270,31 @@ export class PaymentService {
     };
   }
 
-  async getUserTransactions(userId: number) {
-    return this.transactionRepository.find({
+  async getUserTransactions(userId: string) {
+    const transactions = await this.transactionRepository.find({
       where: { userId },
       order: { createdAt: 'DESC' },
+      relations: ['subscription'],
     });
+
+    // Format response để dễ đọc hơn
+    return transactions.map((transaction) => ({
+      id: transaction.id,
+      orderId: transaction.paypalOrderId,
+      captureId: transaction.paypalCaptureId,
+      amount: transaction.amount,
+      currency: transaction.currency,
+      status: transaction.status,
+      paymentMethod: transaction.paymentMethod,
+      description: transaction.description,
+      plan: transaction.metadata?.plan,
+      payerEmail: transaction.payerEmail,
+      payerName: transaction.payerName,
+      createdAt: transaction.createdAt,
+      completedAt: transaction.completedAt,
+      refundedAt: transaction.refundedAt,
+      errorMessage: transaction.errorMessage,
+    }));
   }
 
   async getSubscriptionPlans() {
