@@ -10,14 +10,15 @@ import {
   TransactionStatus,
   PaymentMethod,
 } from '@app/database/entities';
-import { Client, Environment } from '@paypal/paypal-server-sdk';
+import { Client, Environment, OrdersController, CheckoutPaymentIntent } from '@paypal/paypal-server-sdk';
 import { CreateOrderDto, CaptureOrderDto } from './dto/payment.dto';
 import { SUBSCRIPTION_PLANS } from './constants/subscription-plans';
 
 @Injectable()
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
-  private paypalClient: any;
+  private paypalClient: Client;
+  private ordersController: OrdersController;
 
   constructor(
     @InjectRepository(Subscription)
@@ -46,6 +47,8 @@ export class PaymentService {
       environment: environment === 'production' ? Environment.Production : Environment.Sandbox,
     });
 
+    this.ordersController = new OrdersController(this.paypalClient);
+
     this.logger.log(`PayPal client initialized in ${environment} mode`);
   }
 
@@ -66,9 +69,9 @@ export class PaymentService {
 
     try {
       // Create PayPal order
-      const request = {
+      const collect = {
         body: {
-          intent: 'CAPTURE',
+          intent: CheckoutPaymentIntent.Capture,
           purchaseUnits: [
             {
               amount: {
@@ -85,12 +88,12 @@ export class PaymentService {
         },
       };
 
-      const { body: order } = await this.paypalClient.orders.create(request);
+      const { result: order } = await this.ordersController.createOrder(collect);
 
       // Save transaction to database
       const transaction = this.transactionRepository.create({
         userId,
-        paypalOrderId: order.id,
+        paypalOrderId: order.id!,
         amount: orderAmount,
         currency: 'USD',
         paymentMethod: PaymentMethod.PAYPAL,
@@ -104,8 +107,8 @@ export class PaymentService {
       this.logger.log(`Order created: ${order.id} for user ${userId}`);
 
       return {
-        orderId: order.id,
-        approvalUrl: order.links.find((link) => link.rel === 'approve')?.href,
+        orderId: order.id!,
+        approvalUrl: order.links?.find((link) => link.rel === 'approve')?.href || '',
         amount: orderAmount,
         currency: 'USD',
       };
@@ -133,13 +136,14 @@ export class PaymentService {
 
     try {
       // Capture PayPal order
-      const { body: captureData } = await this.paypalClient.orders.capture({
+      const { result: captureData } = await this.ordersController.captureOrder({
         id: orderId,
+        prefer: 'return=representation',
       });
 
       // Update transaction
       transaction.status = TransactionStatus.COMPLETED;
-      transaction.paypalCaptureId = captureData.id;
+      transaction.paypalCaptureId = captureData.id!;
       transaction.completedAt = new Date();
       await this.transactionRepository.save(transaction);
 

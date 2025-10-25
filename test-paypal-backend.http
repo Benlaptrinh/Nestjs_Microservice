@@ -1,0 +1,91 @@
+### PayPal Backend Testing
+### Sử dụng REST Client extension trong VS Code hoặc copy vào Postman
+
+### Variables
+@baseUrl = http://localhost:3008
+@authUrl = http://localhost:3001
+@jwtToken = your-jwt-token-here
+
+### 1. Test Health Check (không cần auth)
+GET {{baseUrl}}/payment/plans
+Content-Type: application/json
+
+### Expected Response: Danh sách 4 gói subscription (FREE, BASIC, PREMIUM, VIP)
+
+###
+
+### 2. Login để lấy JWT Token (thay email/password của bạn)
+POST {{authUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+### Copy "access_token" từ response vào @jwtToken ở trên
+
+###
+
+### 3. Test Get Current Subscription (cần JWT)
+GET {{baseUrl}}/payment/subscription
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+### Expected Response: Current subscription info (mặc định là FREE)
+
+###
+
+### 4. Test Create PayPal Order (cần JWT)
+POST {{baseUrl}}/payment/create-order
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "plan": "PREMIUM",
+  "description": "Test Premium Subscription"
+}
+
+### Expected Response: 
+### {
+###   "orderId": "5O190127TN364715T",
+###   "approvalUrl": "https://www.sandbox.paypal.com/checkoutnow?token=...",
+###   "amount": 19.99,
+###   "currency": "USD"
+### }
+### Copy orderId để dùng ở bước tiếp theo
+
+###
+
+### 5. Test Capture Order (SAU KHI ĐÃ THANH TOÁN TRÊN PAYPAL)
+### Mở approvalUrl từ step 4, login PayPal sandbox account, click Pay Now
+### Sau đó mới chạy request này
+POST {{baseUrl}}/payment/capture-order
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "orderId": "paste-order-id-from-step-4"
+}
+
+### Expected Response:
+### {
+###   "transactionId": 1,
+###   "status": "COMPLETED",
+###   "subscription": {
+###     "plan": "PREMIUM",
+###     "startDate": "2025-10-25...",
+###     "endDate": "2025-11-24..."
+###   }
+### }
+
+###
+
+### 6. Test Get Transactions History (cần JWT)
+GET {{baseUrl}}/payment/transactions
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+### Expected Response: Danh sách tất cả transactions của user
+
+###
